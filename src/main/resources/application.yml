@@ -1,0 +1,5 @@
+server:
+  context-path: /apimock
+
+info:
+  version: @pom.version@
