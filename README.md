@@ -8,6 +8,11 @@ This software is released under the MIT License, see LICENSE.md.
 - JDK 1.8
 - Maven 3
 
+## Feature
+- Simulate json style API behaviour
+    + GET, POST and other HTTP methods
+    + can respond different json for same `Endpoint`, if `HttpMethod` or `RequestBody` or `QueryString` is different.
+
 ## Usage
 Sorry, it is under construction.
 
