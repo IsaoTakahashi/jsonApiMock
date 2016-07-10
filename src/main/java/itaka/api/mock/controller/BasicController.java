@@ -19,7 +19,7 @@ import javax.servlet.http.HttpServletRequest;
  */
 @RestController
 @Slf4j
-public class ApiMockController {
+public class BasicController {
 
     @RequestMapping(value = "register/**")
     @ResponseStatus(HttpStatus.CREATED)
@@ -49,6 +49,14 @@ public class ApiMockController {
         ApiMockData apiMockData = ApiMockDataRegistry.get(id).orElse(new ApiMockData());
 
         return buildResponseEntity(apiMockData.getResponse());
+    }
+
+    @RequestMapping(value = "test/**")
+    public ApiMockData testMock(HttpServletRequest request) {
+        ApiMockRequest apiMockRequest = new ApiMockRequest(request, "/test");
+        String id = apiMockRequest.hash();
+
+        return ApiMockDataRegistry.get(id).orElse(new ApiMockData());
     }
 
     private ResponseEntity<String> buildResponseEntity(ApiMockResponse apiMockResponse) {
