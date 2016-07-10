@@ -1,6 +1,8 @@
 # jsonApiMock
 Mock application for API which responds json
 
+![jsonApiMock_simpleflow.png](https://qiita-image-store.s3.amazonaws.com/0/72808/e24538af-e8df-2969-506a-f68e7de8b73b.png)
+
 ## Lisence
 This software is released under the MIT License, see LICENSE.md.
 
@@ -15,6 +17,8 @@ This software is released under the MIT License, see LICENSE.md.
 - Simulate json style API behaviour
     + GET, POST and other HTTP methods
     + can respond different json for same `Endpoint`, if `HttpMethod` or `RequestBody` or `QueryString` is different.
+- Grab client's request and API response as mock data
+    + for detail, please refer "Spy Mode".
 
 ## Usage
 
@@ -33,7 +37,33 @@ java -jar target/jsonAPIMock.jar
 call `http://localhost:8080/apimock/health`
 (default port is 8080, you can change it by modifying `server.port` in src/main/resources/application.yml)
 
+### Mock Data Definition
+Here is a sample mock data.
+```json
+{
+  "id": "15a21d17049b1091daa109e4234bf3ad",
+  "request": {
+    "endpoint": "/users",
+    "method": "POST",
+    "contentType": "application/x-www-form-urlencoded",
+    "body": "",
+    "params": [
+      {
+        "key": "name",
+        "value": "Jiro"
+      }
+    ]
+  },
+  "response": {
+    "body": "{\n  \"name\": \"Jiro\",\n  \"id\": 3\n}",
+    "httpStatus": 201
+  }
+}
+```
+
+
 ### Simple Flow
+![jsonApiMock_simpleflow.png](https://qiita-image-store.s3.amazonaws.com/0/72808/e24538af-e8df-2969-506a-f68e7de8b73b.png)
 1. register mock request via `/apimock/request/{mockTargetPath}`
 2. register mock response via `/apimock/response/{id}/{status}`
 3. call `/apimock/execute/{mockTargetPath}` to retrieve mocked response
@@ -42,6 +72,8 @@ call `http://localhost:8080/apimock/health`
 :sunglasses:  
 In this mode, jsonApiMock will be proxy between client app and actual API.
 And jsonApiMock grabs client's request and API's response as API mock data.
+
+![jsonApiMock_spymode.png](https://qiita-image-store.s3.amazonaws.com/0/72808/7af60031-62eb-bd37-63dd-fbae346263b9.png)
 
 1. set actual API url as `apimock.spy-target-url` in application.yml.  
    (you can set the property running jar file.   
