@@ -31,11 +31,25 @@ java -jar target/jsonAPIMock.jar
 
 #### Health Check
 call `http://localhost:8080/apimock/health`
+(default port is 8080, you can change it by modifying `server.port` in src/main/resources/application.yml)
 
 ### Simple Flow
 1. register mock request via `/apimock/request/{mockTargetPath}`
 2. register mock response via `/apimock/response/{id}/{status}`
 3. call `/apimock/execute/{mockTargetPath}` to retrieve mocked response
+
+### Spy Mode (Experimental)
+:sunglasses:  
+In this mode, jsonApiMock will be proxy between client app and actual API.
+And jsonApiMock grabs client's request and API's response as API mock data.
+
+1. set actual API url as `apimock.spy-target-url` in application.yml.  
+   (you can set the property running jar file.   
+    e.g. `java -jar target/jsonAPIMock.jar --apimock.spy-target-url="http://actual.api.com/root" `)
+2. client app calls api via `/apimock/spy/{mockTargetPath}`
+   -> jsonApiMock call actual API with client's request.
+   -> jsonApiMock returns API's response to client.
+3. you can get mocked API response via `/apimock/execute/{mockTargetPath}`
 
 ## Endpoints
 ### Basic Endpoints
@@ -196,3 +210,37 @@ curl -H "Content-type: application/json" -X POST http://localhost:8080/apimock/d
 
 ##> ["417926714941341a6706616733719fed","3440f2e01a9d2779b2823811b5e5cf9c"]
 ```
+
+### Spy Endpoint
+#### /apimock/spy/{mockTargetPath} [anyMethod]
+proxy user's request to actual API, and return API's response as it as.
+
+##### Request
+- {mockTargetPath} : endpoint you want to mock
+- HttpMethod, RequestBody, QueryString : same value when you call Original API
+
+##### Response
+actual API's response
+
+##### Sample
+```shell
+# run with setting actual API url
+java -jar target/jsonAPIMock.jar --apimock.spy-target-url="http://gturnquist-quoters.cfapps.io"
+
+# confirm thre is not mock data (optional)
+curl http://localhost:8080/apimock/data
+##> []
+
+# spy actual API request
+curl http://localhost:8080/apimock/spy/api/random
+##> {"type":"success","value":{"id":12,"quote":"@springboot with @springframework is pure productivity! Who said in #java one has to write double the code than in other langs? #newFavLib"}}
+
+# confirm spy result
+curl http://localhost:8080/apimock/data
+##> [{"id":"89150a098c708c1cfc2c26c03b867902","request":{"endpoint":"/api/random","method":"GET","contentType":null,"body":"","params":[]},"response":{"body":"{\"type\":\"success\",\"value\":{\"id\":12,\"quote\":\"@springboot with @springframework is pure productivity! Who said in #java one has to write double the code than in other langs? #newFavLib\"}}","httpStatus":200}}]
+
+# you can execute this mock
+curl http://localhost:8080/apimock/execute/api/random
+##> {"type":"success","value":{"id":12,"quote":"@springboot with @springframework is pure productivity! Who said in #java one has to write double the code than in other langs? #newFavLib"}}
+```
+

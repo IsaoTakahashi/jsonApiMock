@@ -25,7 +25,7 @@ public class ApiMockDataRegistry {
             key = apiMockData.getRequest().hash();
         }
 
-        log.debug("register mock data wiht id = {}, data = {}", key, apiMockData);
+        log.info("register mock data wiht id = {}, data = {}", key, apiMockData);
         DATA_MAP.put(key, apiMockData);
 
         return key;

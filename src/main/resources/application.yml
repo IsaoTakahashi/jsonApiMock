@@ -1,5 +1,9 @@
 server:
   context-path: /apimock
+  port: 8080
 
 info:
   version: @pom.version@
+
+apimock:
+  spy-target-url: http://localhost:3000

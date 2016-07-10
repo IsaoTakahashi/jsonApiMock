@@ -23,12 +23,14 @@ import java.util.stream.Collectors;
 public class ApiMockRequest {
     String endpoint;
     String method;
+    String contentType;
     String body;
     List<RequestParam> params;
 
     public ApiMockRequest(HttpServletRequest request,String path) {
         this.endpoint = request.getServletPath().replaceFirst(path,"");
         this.method = request.getMethod();
+        this.contentType = request.getContentType();
         this.body = RequestConverter.getBody(request);
         this.params = RequestConverter.getParams(request);
     }
@@ -41,6 +43,7 @@ public class ApiMockRequest {
         String identifiedString = new StringBuilder()
                 .append(endpoint)
                 .append(method)
+                .append(contentType)
                 .append(body.replaceAll("\\s",""))
                 .append(paramString)
                 .toString();
