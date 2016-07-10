@@ -21,17 +21,17 @@ import javax.servlet.http.HttpServletRequest;
 @Slf4j
 public class BasicController {
 
-    @RequestMapping(value = "register/**")
+    @RequestMapping(value = "request/**")
     @ResponseStatus(HttpStatus.CREATED)
     public String registerRequest(HttpServletRequest request) {
-        ApiMockRequest apiMockRequest = new ApiMockRequest(request, "/register");
+        ApiMockRequest apiMockRequest = new ApiMockRequest(request, "/request");
         String id = apiMockRequest.hash();
         ApiMockDataRegistry.register(id, apiMockRequest);
 
         return id;
     }
 
-    @RequestMapping(value = "updateResponse/{id}/{status}", method = RequestMethod.POST)
+    @RequestMapping(value = "response/{id}/{status}", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
     public String updateResponse(@PathVariable String id, @PathVariable Integer status, HttpServletRequest request) {
         if (!ApiMockDataRegistry.isExists(id)) {

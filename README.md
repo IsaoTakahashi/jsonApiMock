@@ -8,17 +8,38 @@ This software is released under the MIT License, see LICENSE.md.
 - JDK 1.8
 - Maven 3
 
+## Framework
+- Spring Boot 1.3.6
+
 ## Feature
 - Simulate json style API behaviour
     + GET, POST and other HTTP methods
     + can respond different json for same `Endpoint`, if `HttpMethod` or `RequestBody` or `QueryString` is different.
 
 ## Usage
-Sorry, it is under construction.
+
+### How to startup
+```shell
+mvn spring-boot:run
+```
+or run packaged jar
+
+```shell
+mvn package
+java -jar target/jsonAPIMock.jar
+```
+
+#### Health Check
+call `http://localhost:8080/apimock/health`
+
+### Simple Flow
+1. register mock request via `/apimock/request/{mockTargetPath}`
+2. register mock response via `/apimock/response/{id}/{status}`
+3. call `/apimock/execute/{mockTargetPath}` to retrieve mocked response
 
 ## Endpoints
 ### Basic Endpoints
-#### /apimock/register/{mockTargetPath} [anyMethod]
+#### /apimock/request/{mockTargetPath} [anyMethod]
 register API request's `Endpoint` / `HttpMethod` / `RequestBody` and `QueryString` as Mock Data.
 
 #### Request
@@ -31,12 +52,12 @@ reference ID of API mock data
 #### Sample
 ```shell
 #register mock data for /test/hoge with 'name' parameter
-curl http://localhost:8080/apimock/register/test/hoge?name=John
+curl http://localhost:8080/apimock/request/test/hoge?name=John
 
 ##> 3440f2e01a9d2779b2823811b5e5cf9c
 ```
 
-#### /apimock/updateResponse/{id}/{status} [POST]
+#### /apimock/response/{id}/{status} [POST]
 register or update mock response body and status for mocked request.
 
 ##### Request
@@ -50,7 +71,8 @@ reference ID of API mock data
 ##### Sample
 ```shell
 # update response for 3440f2e01a9d2779b2823811b5e5cf9c as 200 status
-curl -H "Content-type: application/json" -X POST http://localhost:8080/apimock/updateResponse/3440f2e01a9d2779b2823811b5e5cf9c/200 -d '{"greeting" : "hello, John!"}'
+curl -H "Content-type: application/json" -X POST http://localhost:8080/apimock/response/3440f2e01a9d2779b2823811b5e5cf9c/200 -d '
+{"greeting" : "hello, John!"}'
 
 ##> 3440f2e01a9d2779b2823811b5e5cf9c
 ```
@@ -68,7 +90,7 @@ mocked API response you registered via `/apimock/updateResponse`
 ##### Sample
 ```shell
 # request is matched
-http://localhost:8080/apimock/execute/test/hoge?name=John
+curl http://localhost:8080/apimock/execute/test/hoge?name=John
 
 ##> {"greeting" : "hello, John!"}
 
