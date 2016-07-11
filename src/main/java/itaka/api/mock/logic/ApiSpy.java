@@ -7,9 +7,9 @@ import itaka.api.mock.bean.ApiMockResponse;
 import itaka.api.mock.registry.ApiMockDataRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
@@ -20,7 +20,6 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
-import java.net.URI;
 import java.net.URISyntaxException;
 
 /**
@@ -35,9 +34,10 @@ public class ApiSpy {
 
     private RestTemplate restTemplate;
 
-    public ApiSpy(){
+    public ApiSpy() {
         restTemplate = new RestTemplate();
         restTemplate.setErrorHandler(new SpyRestTemplateErrorHandler());
+        restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
         HttpMessageConverter formHttpMessageConverter = new FormHttpMessageConverter();
         HttpMessageConverter stringHttpMessageConverter = new StringHttpMessageConverter();
         restTemplate.setMessageConverters(ImmutableList.of(formHttpMessageConverter, stringHttpMessageConverter));
@@ -56,16 +56,14 @@ public class ApiSpy {
 
         ApiMockDataRegistry.register(apiMockData);
 
-        return responseEntity;
+        return createResponse(responseEntity);
     }
 
     private ResponseEntity<String> callAPI(ApiMockRequest mockRequest) throws URISyntaxException {
-        URI uri = new URI(spyTargetUrl + mockRequest.getEndpoint());
-
         HttpHeaders headers = new HttpHeaders();
         headers.set("Accept", MediaType.APPLICATION_JSON_VALUE);
 
-        if(mockRequest.getContentType() != null) {
+        if (mockRequest.getContentType() != null) {
             headers.setContentType(MediaType.parseMediaType(mockRequest.getContentType()));
         }
 
@@ -73,13 +71,13 @@ public class ApiSpy {
         MultiValueMap<String, String> paramMap = new LinkedMultiValueMap<>();
 
         mockRequest.getParams().stream().forEach(p -> {
-            builder.queryParam(p.getKey(),p.getValue());
-            paramMap.add(p.getKey(),p.getValue());
+            builder.queryParam(p.getKey(), p.getValue());
+            paramMap.add(p.getKey(), p.getValue());
         });
         HttpEntity<?> entity;
 
-        if(StringUtils.isNotEmpty(mockRequest.getBody())) {
-            entity = new HttpEntity<>(mockRequest.getBody(),headers);
+        if (StringUtils.isNotEmpty(mockRequest.getBody())) {
+            entity = new HttpEntity<>(mockRequest.getBody(), headers);
         } else {
             entity = new HttpEntity<>(paramMap, headers);
         }
@@ -89,5 +87,12 @@ public class ApiSpy {
                 HttpMethod.valueOf(mockRequest.getMethod()),
                 entity,
                 String.class);
+    }
+
+    private ResponseEntity<String> createResponse(ResponseEntity<String> apiEntity) {
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.setContentType(apiEntity.getHeaders().getContentType());
+
+        return new ResponseEntity<>(apiEntity.getBody(), responseHeaders, apiEntity.getStatusCode());
     }
 }
