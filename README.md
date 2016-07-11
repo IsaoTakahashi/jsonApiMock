@@ -1,17 +1,6 @@
 # jsonApiMock
-Mock application for API which responds json
-
-![jsonApiMock_simpleflow.png](https://qiita-image-store.s3.amazonaws.com/0/72808/e24538af-e8df-2969-506a-f68e7de8b73b.png)
-
-## Lisence
-This software is released under the MIT License, see LICENSE.md.
-
-## Environment
-- JDK 1.8
-- Maven 3
-
-## Framework
-- Spring Boot 1.3.6
+Mock application for API which responds json  
+(日本語のドキュメントは[こちら](http://qiita.com/IsaoTakahashi/items/a2a184710f1b7834f19d))
 
 ## Feature
 - Simulate json style API behaviour
@@ -20,25 +9,22 @@ This software is released under the MIT License, see LICENSE.md.
 - Grab client's request and API response as mock data
     + for detail, please refer "Spy Mode".
 
-## Usage
+![jsonApiMock_simpleflow.png](https://qiita-image-store.s3.amazonaws.com/0/72808/e24538af-e8df-2969-506a-f68e7de8b73b.png)
 
-### How to startup
-```shell
-mvn spring-boot:run
-```
-or run packaged jar
+### What is mocked in jsonApiMock?
 
-```shell
-mvn package
-java -jar target/jsonAPIMock.jar
-```
+- Request
+    + Endpoint
+    + Method
+    + Content-type
+    + Body
+    + Parameters (QueryString)
+- Response
+    + Body
+    + Status
 
-#### Health Check
-call `http://localhost:8080/apimock/health`
-(default port is 8080, you can change it by modifying `server.port` in src/main/resources/application.yml)
+Here is API mock data.
 
-### Mock Data Definition
-Here is a sample mock data.
 ```json
 {
   "id": "15a21d17049b1091daa109e4234bf3ad",
@@ -61,12 +47,52 @@ Here is a sample mock data.
 }
 ```
 
+## Environment
+- JDK 1.8
+- Maven 3
+
+## Framework
+- Spring Boot 1.3.6
+
+## Usage
+
+### How to startup
+```shell
+mvn spring-boot:run
+```
+or run packaged jar
+
+```shell
+mvn package
+java -jar target/jsonAPIMock.jar
+```
+
+#### Health Check
+call `http://localhost:8080/apimock/health`
+(default port is 8080, you can change it by modifying `server.port` in src/main/resources/application.yml)
 
 ### Simple Flow
 ![jsonApiMock_simpleflow.png](https://qiita-image-store.s3.amazonaws.com/0/72808/e24538af-e8df-2969-506a-f68e7de8b73b.png)
+
 1. register mock request via `/apimock/request/{mockTargetPath}`
 2. register mock response via `/apimock/response/{id}/{status}`
 3. call `/apimock/execute/{mockTargetPath}` to retrieve mocked response
+
+
+```shell
+# register Request for "/test/hoge" 
+curl http://localhost:8080/apimock/request/test/hoge?name=John
+##> 3440f2e01a9d2779b2823811b5e5cf9c
+
+# register Response for "/test/hoge"
+curl -H "Content-type: application/json" -X POST http://localhost:8080/apimock/response/3440f2e01a9d2779b2823811b5e5cf9c/200 -d '
+{"greeting" : "hello, John!"}'
+##> 3440f2e01a9d2779b2823811b5e5cf9c
+
+# use mock as "/test/hoge"
+curl http://localhost:8080/apimock/execute/test/hoge?name=John
+##> {"greeting" : "hello, John!"}
+```
 
 ### Spy Mode (Experimental)
 :sunglasses:  
@@ -82,6 +108,8 @@ And jsonApiMock grabs client's request and API's response as API mock data.
    -> jsonApiMock call actual API with client's request.
    -> jsonApiMock returns API's response to client.
 3. you can get mocked API response via `/apimock/execute/{mockTargetPath}`
+
+For detail, please refer to [Spy Endpoint](#spy-endpoint)
 
 ## Endpoints
 ### Basic Endpoints
@@ -249,7 +277,7 @@ proxy user's request to actual API, and return API's response as it as.
 
 ##### Request
 - {mockTargetPath} : endpoint you want to mock
-- HttpMethod, RequestBody, QueryString : same value when you call Original API
+- HttpMethod, RequestBody, QueryString : same value when you call actual API
 
 ##### Response
 actual API's response
@@ -276,3 +304,5 @@ curl http://localhost:8080/apimock/execute/api/random
 ##> {"type":"success","value":{"id":12,"quote":"@springboot with @springframework is pure productivity! Who said in #java one has to write double the code than in other langs? #newFavLib"}}
 ```
 
+## Lisence
+This software is released under the MIT License, see LICENSE.md.
