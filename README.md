@@ -293,6 +293,10 @@ actual API's response
 # run with setting actual API url
 java -jar target/jsonAPIMock.jar --apimock.spy-target-url="http://gturnquist-quoters.cfapps.io"
 
+# or, you can live-update the url via /env endpoint
+curl -X POST http://localhost:8080/apimock/env -d apimock.spy-target-url="http://gturnquist-quoters.cfapps.io"
+##> {"apimock.spy-target-url":"http://gturnquist-quoters.cfapps.io"}
+
 # confirm thre is not mock data (optional)
 curl http://localhost:8080/apimock/data
 ##> []

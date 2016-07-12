@@ -34,7 +34,9 @@ public class ApiMockRequest {
         this.body = RequestConverter.getBody(request);
         this.params = RequestConverter.getParams(request);
 
+        // some header is not recorded due to "/spy".
         Collections.list(request.getHeaderNames()).stream()
+                .filter(name -> !name.equals("host"))
                 .forEach(name -> headers.put(name,request.getHeader(name)));
     }
 

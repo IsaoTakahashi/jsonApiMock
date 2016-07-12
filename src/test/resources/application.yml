@@ -1,0 +1,9 @@
+server:
+  context-path: /apimock
+  port: 8080
+
+info:
+  version: test_ver
+
+apimock:
+  spy-target-url: http://localhost:8080/apimock
