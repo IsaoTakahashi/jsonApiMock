@@ -27,23 +27,27 @@ Here is API mock data.
 
 ```json
 {
-  "id": "15a21d17049b1091daa109e4234bf3ad",
-  "request": {
-    "endpoint": "/users",
-    "method": "POST",
-    "contentType": "application/x-www-form-urlencoded",
-    "body": "",
-    "params": [
-      {
-        "key": "name",
-        "value": "Jiro"
-      }
-    ]
-  },
-  "response": {
-    "body": "{\n  \"name\": \"Jiro\",\n  \"id\": 3\n}",
-    "httpStatus": 201
-  }
+    "id": "82b16c33c5060e5d57e9d2111d465c1c",
+    "request": {
+        "body": "",
+        "endpoint": "/users",
+        "headers": {
+            "accept": "*/*",
+            "host": "localhost:8080",
+            "user-agent": "curl/7.43.0"
+        },
+        "method": "GET",
+        "params": [
+            {
+                "key": "name",
+                "value": "Jiro"
+            }
+        ]
+    },
+    "response": {
+        "body": "[\n  {\n    \"name\": \"Jiro\",\n    \"id\": 3\n  }\n]",
+        "httpStatus": 200
+    }
 }
 ```
 
