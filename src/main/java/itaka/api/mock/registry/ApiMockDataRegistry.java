@@ -12,6 +12,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static java.util.Comparator.comparing;
+
 /**
  * Created by isao on 2016/07/09.
  */
@@ -21,7 +23,7 @@ public class ApiMockDataRegistry {
 
     public static String register(ApiMockData apiMockData) {
         String key = apiMockData.getId();
-        if(StringUtils.isBlank(key)) {
+        if (StringUtils.isBlank(key)) {
             key = apiMockData.getRequest().hash();
         }
 
@@ -52,7 +54,10 @@ public class ApiMockDataRegistry {
     }
 
     public static List<ApiMockData> getList() {
-        return DATA_MAP.entrySet().stream().map(Map.Entry::getValue).collect(Collectors.toList());
+        return DATA_MAP.entrySet().stream()
+                .map(Map.Entry::getValue)
+                .sorted(comparing(data -> data.getRequest().getEndpoint()))
+                .collect(Collectors.toList());
     }
 
     public static boolean isExists(String id) {

@@ -2,9 +2,10 @@ package itaka.api.mock.logic;
 
 import com.google.common.collect.ImmutableList;
 import itaka.api.mock.bean.ApiMockRequest;
+import itaka.api.mock.config.ApiMockProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.RequestEntity;
@@ -29,12 +30,14 @@ import java.net.URISyntaxException;
 @Slf4j
 public class ApiCaller {
 
-    @Value(value = "${apimock.spy-target-url}")
-    private String spyTargetUrl;
+    private ApiMockProperties apiMockProperties;
 
     private RestTemplate restTemplate;
 
-    public ApiCaller() {
+    @Autowired
+    public ApiCaller(ApiMockProperties apiMockProperties) {
+        this.apiMockProperties = apiMockProperties;
+
         restTemplate = new RestTemplate();
         restTemplate.setErrorHandler(new SpyRestTemplateErrorHandler());
         restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
@@ -55,7 +58,7 @@ public class ApiCaller {
         HttpMethod httpMethod = HttpMethod.valueOf(mockRequest.getMethod());
 
         RequestEntity<?> requestEntity;
-        String urlString = spyTargetUrl + mockRequest.getEndpoint();
+        String urlString = apiMockProperties.getSpyTargetUrl() + mockRequest.getEndpoint();
 
         if (httpMethod == HttpMethod.GET) {
             UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(urlString);
@@ -78,7 +81,9 @@ public class ApiCaller {
 
     private ResponseEntity<String> createResponseEntity(ResponseEntity<String> apiEntity) {
         HttpHeaders responseHeaders = new HttpHeaders();
-        responseHeaders.setContentType(apiEntity.getHeaders().getContentType());
+        if(apiEntity.getHeaders().getContentType() != null) {
+            responseHeaders.setContentType(apiEntity.getHeaders().getContentType());
+        }
 
         return new ResponseEntity<>(apiEntity.getBody(), responseHeaders, apiEntity.getStatusCode());
     }
