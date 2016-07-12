@@ -1,4 +1,6 @@
 # jsonApiMock
+![circle_ci_result](https://circleci.com/gh/IsaoTakahashi/jsonApiMock.png?style=shield&circle-token=%204347e2fed3eca5da1b49bae9327de054d5f8f3c2)
+
 Mock application for API which responds json  
 (日本語のドキュメントは[こちら](http://qiita.com/IsaoTakahashi/items/a2a184710f1b7834f19d))
 
