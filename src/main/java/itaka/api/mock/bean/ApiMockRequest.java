@@ -8,9 +8,10 @@ import lombok.experimental.Accessors;
 import org.springframework.util.DigestUtils;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.BufferedReader;
-import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -23,16 +24,18 @@ import java.util.stream.Collectors;
 public class ApiMockRequest {
     String endpoint;
     String method;
-    String contentType;
+    Map<String, String> headers = new HashMap<>();
     String body;
     List<RequestParam> params;
 
     public ApiMockRequest(HttpServletRequest request,String path) {
         this.endpoint = request.getServletPath().replaceFirst(path,"");
         this.method = request.getMethod();
-        this.contentType = request.getContentType();
         this.body = RequestConverter.getBody(request);
         this.params = RequestConverter.getParams(request);
+
+        Collections.list(request.getHeaderNames()).stream()
+                .forEach(name -> headers.put(name,request.getHeader(name)));
     }
 
     public String hash() {
@@ -43,7 +46,6 @@ public class ApiMockRequest {
         String identifiedString = new StringBuilder()
                 .append(endpoint)
                 .append(method)
-                .append(contentType)
                 .append(body.replaceAll("\\s",""))
                 .append(paramString)
                 .toString();
