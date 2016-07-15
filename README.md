@@ -277,6 +277,26 @@ curl -H "Content-type: application/json" -X POST http://localhost:8080/apimock/d
 ##> ["417926714941341a6706616733719fed","3440f2e01a9d2779b2823811b5e5cf9c"]
 ```
 
+#### /apimock/save [POST]
+save registered mock data to static file.
+
+##### Request
+None
+
+##### Response
+- message
+- (create/overwrite `data.json`)
+
+#### /apimock/load [POST]
+load mock data from static file.
+
+##### Request
+None
+
+##### Response
+- message
+- (load data from `data.json`)
+
 ### Spy Endpoint
 #### /apimock/spy/{mockTargetPath} [anyMethod]
 proxy user's request to actual API, and return API's response as it as.
