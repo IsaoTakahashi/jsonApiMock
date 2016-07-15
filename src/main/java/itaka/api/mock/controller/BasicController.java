@@ -7,6 +7,7 @@ import itaka.api.mock.exception.NoMockDataException;
 import itaka.api.mock.registry.ApiMockDataRegistry;
 import itaka.api.mock.util.RequestConverter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,12 +22,15 @@ import javax.servlet.http.HttpServletRequest;
 @Slf4j
 public class BasicController {
 
+    @Autowired
+    ApiMockDataRegistry apiMockDataRegistry;
+
     @RequestMapping(value = "request/**")
     @ResponseStatus(HttpStatus.CREATED)
     public String registerRequest(HttpServletRequest request) {
         ApiMockRequest apiMockRequest = new ApiMockRequest(request, "/request");
         String id = apiMockRequest.hash();
-        ApiMockDataRegistry.register(id, apiMockRequest);
+        apiMockDataRegistry.register(id, apiMockRequest);
 
         return id;
     }
@@ -34,11 +38,11 @@ public class BasicController {
     @RequestMapping(value = "response/{id}/{status}", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
     public String updateResponse(@PathVariable String id, @PathVariable Integer status, HttpServletRequest request) {
-        if (!ApiMockDataRegistry.isExists(id)) {
+        if (!apiMockDataRegistry.isExists(id)) {
             throw new NoMockDataException("requested data is not found : " + id);
         }
 
-        ApiMockDataRegistry.updateResponse(id, new ApiMockResponse(RequestConverter.getBody(request), status));
+        apiMockDataRegistry.updateResponse(id, new ApiMockResponse(RequestConverter.getBody(request), status));
         return id;
     }
 
@@ -46,7 +50,7 @@ public class BasicController {
     public ResponseEntity<String> executeMock(HttpServletRequest request) {
         ApiMockRequest apiMockRequest = new ApiMockRequest(request, "/execute");
         String id = apiMockRequest.hash();
-        ApiMockData apiMockData = ApiMockDataRegistry.get(id).orElse(new ApiMockData());
+        ApiMockData apiMockData = apiMockDataRegistry.get(id).orElse(new ApiMockData());
 
         return buildResponseEntity(apiMockData.getResponse());
     }
@@ -56,7 +60,7 @@ public class BasicController {
         ApiMockRequest apiMockRequest = new ApiMockRequest(request, "/test");
         String id = apiMockRequest.hash();
 
-        return ApiMockDataRegistry.get(id).orElse(new ApiMockData());
+        return apiMockDataRegistry.get(id).orElse(new ApiMockData());
     }
 
     private ResponseEntity<String> buildResponseEntity(ApiMockResponse apiMockResponse) {
