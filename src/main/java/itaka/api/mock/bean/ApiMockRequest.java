@@ -8,10 +8,7 @@ import lombok.experimental.Accessors;
 import org.springframework.util.DigestUtils;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -25,8 +22,8 @@ public class ApiMockRequest {
     String endpoint;
     String method;
     Map<String, String> headers = new HashMap<>();
-    String body;
-    List<RequestParam> params;
+    String body = "";
+    List<RequestParam> params = new ArrayList<>();
 
     public ApiMockRequest(HttpServletRequest request,String path) {
         this.endpoint = request.getServletPath().replaceFirst(path,"");

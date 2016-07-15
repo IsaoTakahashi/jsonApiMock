@@ -15,4 +15,5 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "apimock")
 public class ApiMockProperties {
     private String spyTargetUrl;
+    private String dataFilePath;
 }

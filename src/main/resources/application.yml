@@ -7,3 +7,4 @@ info:
 
 apimock:
   spy-target-url: http://localhost:3000
+  data-file-path: data.json

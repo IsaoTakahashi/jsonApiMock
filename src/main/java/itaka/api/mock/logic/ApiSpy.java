@@ -20,10 +20,12 @@ import java.net.URISyntaxException;
 public class ApiSpy {
 
     private ApiCaller apiCaller;
+    private ApiMockDataRegistry apiMockDataRegistry;
 
     @Autowired
-    public ApiSpy(ApiCaller apiCaller) {
+    public ApiSpy(ApiCaller apiCaller, ApiMockDataRegistry apiMockDataRegistry) {
         this.apiCaller = apiCaller;
+        this.apiMockDataRegistry = apiMockDataRegistry;
     }
 
     public ResponseEntity<String> proxy(HttpServletRequest request) throws URISyntaxException {
@@ -37,7 +39,7 @@ public class ApiSpy {
         ApiMockResponse mockResponse = new ApiMockResponse(responseEntity.getBody(), responseEntity.getStatusCode().value());
         ApiMockData apiMockData = new ApiMockData(mockRequest.hash(), mockRequest, mockResponse);
 
-        ApiMockDataRegistry.register(apiMockData);
+        apiMockDataRegistry.register(apiMockData);
 
         return responseEntity;
     }

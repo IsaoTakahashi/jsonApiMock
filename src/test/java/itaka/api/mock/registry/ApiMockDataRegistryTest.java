@@ -1,12 +1,17 @@
 package itaka.api.mock.registry;
 
+import com.google.common.collect.ImmutableList;
 import itaka.api.mock.bean.ApiMockData;
 import itaka.api.mock.bean.ApiMockRequest;
 import itaka.api.mock.bean.ApiMockResponse;
 import itaka.api.mock.bean.RequestParam;
+import mockit.Expectations;
+import mockit.Mocked;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -23,6 +28,16 @@ public class ApiMockDataRegistryTest {
             .setBody("{}")
             .setParams(Arrays.asList(new RequestParam("key1", "value1")));
 
+    @Mocked
+    private FileManager fileManager;
+
+    private ApiMockDataRegistry apiMockDataRegistry;
+
+    @Before
+    public void setUp() {
+        apiMockDataRegistry = new ApiMockDataRegistry(fileManager);
+    }
+
     @Test
     public void testRegister() {
         String defaultBody = "{\"message\" : \"request is mocked, but response is not defined.}\"";
@@ -30,33 +45,55 @@ public class ApiMockDataRegistryTest {
                 .setBody(defaultBody).setHttpStatus(200);
         ApiMockData expected = new ApiMockData(TEST_ID, TEST_REQUEST, response);
 
-        ApiMockDataRegistry.register(TEST_ID, TEST_REQUEST);
+        apiMockDataRegistry.register(TEST_ID, TEST_REQUEST);
 
-        assertThat(ApiMockDataRegistry.get(TEST_ID).get()).isEqualTo(expected);
+        assertThat(apiMockDataRegistry.get(TEST_ID).get()).isEqualTo(expected);
     }
 
     @Test
     public void testUpdateResponse() {
         ApiMockResponse expected = new ApiMockResponse()
                 .setBody("update").setHttpStatus(200);
-        ApiMockDataRegistry.register(TEST_ID, TEST_REQUEST);
+        apiMockDataRegistry.register(TEST_ID, TEST_REQUEST);
 
-        ApiMockDataRegistry.updateResponse(TEST_ID, expected);
+        apiMockDataRegistry.updateResponse(TEST_ID, expected);
 
-        assertThat(ApiMockDataRegistry.get(TEST_ID).get()).extracting("response").contains(expected);
+        assertThat(apiMockDataRegistry.get(TEST_ID).get()).extracting("response").contains(expected);
     }
 
     @Test
     public void testIsExists_exist() {
-        ApiMockDataRegistry.register(TEST_ID, new ApiMockRequest());
+        apiMockDataRegistry.register(TEST_ID, new ApiMockRequest());
 
-        assertThat(ApiMockDataRegistry.get(TEST_ID)).isPresent();
+        assertThat(apiMockDataRegistry.get(TEST_ID)).isPresent();
     }
 
     @Test
     public void testIsExists_notExist() {
-        ApiMockDataRegistry.register(TEST_ID, new ApiMockRequest());
+        apiMockDataRegistry.register(TEST_ID, new ApiMockRequest());
 
-        assertThat(ApiMockDataRegistry.get(TEST_ID + "hoge")).isEmpty();
+        assertThat(apiMockDataRegistry.get(TEST_ID + "hoge")).isEmpty();
+    }
+
+    @Test
+    public void testSave() {
+        List<ApiMockData> dataList = ImmutableList.of(new ApiMockData());
+        new Expectations() {{
+            fileManager.save(dataList);
+            result = 1;
+        }};
+
+        assertThat(apiMockDataRegistry.save(dataList)).isEqualTo(1);
+    }
+
+    @Test
+    public void testLoad() {
+        List<ApiMockData> dataList = ImmutableList.of(new ApiMockData());
+        new Expectations() {{
+            fileManager.load();
+            result = dataList;
+        }};
+
+        assertThat(apiMockDataRegistry.load()).isEqualTo(1);
     }
 }
