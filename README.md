@@ -4,7 +4,7 @@
 Mock application for API which responds json  
 (日本語のドキュメントは[こちら](http://qiita.com/IsaoTakahashi/items/a2a184710f1b7834f19d))
 
-## Feature
+## Features
 - Simulate json style API behaviour
     + GET, POST and other HTTP methods
     + can respond different json for same `Endpoint`, if `HttpMethod` or `RequestBody` or `QueryString` is different.
